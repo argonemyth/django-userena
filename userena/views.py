@@ -612,6 +612,10 @@ def password_change(request, username, template_name='userena/password_form.html
         form = pass_form(user=user, data=request.POST)
         if form.is_valid():
             form.save()
+            # Need to update session to keep users logged-in if you are
+            # using Django >= 1.7.
+            from django.contrib.auth import update_session_auth_hash
+            update_session_auth_hash(request, form.user)
 
             # Send a signal that the password has changed
             userena_signals.password_complete.send(sender=None,
